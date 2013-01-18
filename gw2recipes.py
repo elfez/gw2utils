@@ -2,6 +2,8 @@
 
 import gw2spidy
 from html import HTML
+import cgitb
+cgitb.enable()
 
 '''
 recipe:
@@ -44,21 +46,68 @@ class recipe:
         url = "http://www.gw2spidy.com/recipe/%d" % self.itemId
         tr.td.a(self.name, href=url, target="_blank")
         marginPct = self.profit / float(self.buyPrice)
-        for i in (self.cost, self.buyPrice, 
-                int(self.profit), "%.2f" % (marginPct * 100)):
+        for i in (self.cost/100.0, self.buyPrice/100.0, 
+                self.profit/ 100.0, "%.2f" % (marginPct * 100)):
             tr.td(str(i), align="right")
         tr.td(disc[self.disc])
         return (tr)
 
+    def toS(self, val):
+        return val / 100.0
+
+def populateScripts(ent):
+
+    scr = """
+function filter2 (phrase, _id){
+	var words = phrase.value.toLowerCase().split(" ");
+	var table = document.getElementById(_id);
+	var ele;
+	for (var r = 1; r < table.rows.length; r++){
+		ele = table.rows[r].innerHTML.replace(/<[^>]+>/g,"");
+	        var displayStyle = 'none';
+	        for (var i = 0; i < words.length; i++) {
+		    if (ele.toLowerCase().indexOf(words[i])>=0)
+			displayStyle = '';
+		    else {
+			displayStyle = 'none';
+			break;
+		    }
+	        }
+		table.rows[r].style.display = displayStyle;
+	}
+}
+"""
+    scr2 = """
+$(document).ready(function()
+{
+
+  $("#recipes").tablesorter({widgets:['zebra'], sortList: [[3,1],],});
+
+});
+"""
+
+
+    body.script(' ', src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js")
+    script = body.script(scr, escape=False, type="text/javascript")
+    body.link(' ', escape=False, rel="stylesheet", text="text/css", 
+            href="http://www.magweb.net/static/js/tablesorter/themes/blue/style.css")
+    body.script(" ", escape=False, type="text/javascript", 
+            src="http://www.magweb.net/static/js/tablesorter/jquery.tablesorter.js")
+    body.script(scr2, escape=False, type="text/javascript")
+    
 
 
 gw2 = gw2spidy.Gw2Spidy()
 
 print "Content-type: text/html\n"
 
-print "<html><body>"
-page = HTML()
-tab = page.table(border="1")
+page = HTML('html')
+body = page.body()
+populateScripts(body)
+
+form = body.form("Filter:", style="margin-left: 10px;")
+form.input(' ', type="text", name="filtrpt", onkeyup="filter2(this,'recipes')")
+tab = body.table(id="recipes", klass="tablesorter", border="1")
 thead = tab.thead()
 thead.th("Name")
 thead.th("Cost")
@@ -81,5 +130,4 @@ for d in range(len(disc)):
         if i.isProfitable():
             tab.text(str(i.genTR()), escape=False)
 
-print tab
-print "</body></html>"
+print page
