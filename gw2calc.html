@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang=en>
+    <head>
+        <meta charset="utf-8" />
+
+        <script>
+        </script>
+    </head>
+
+    <body>
+
+        <h1>GW2 Armour Calc</h1>
+
+        <form id="armourSelect">
+        </form>
+    
+        <table border=1 id="attrTable">
+            <thead>
+                <th>Pow</th>
+                <th>Prec</th>
+                <th>Tough</th>
+                <th>Vit</th>
+                <th>Cond</th>
+                <th>Crit dmg %</th>
+                <th>Magic Find</th>
+                <th>Heal</th>
+                <th>Crit Chance</th>
+            </thead>
+            <tr>
+                <td><input type+"text" value=0 size=3 id="powIn"></td>
+                <td><input type+"text" value=0 size=3 id="precIn"></td>
+                <td><input type+"text" value=0 size=3 id="tougIn"></td>
+                <td><input type+"text" value=0 size=3 id="vitIn"></td>
+                <td><input type+"text" value=0 size=3 id="condIn"></td>
+                <td><input type+"text" value=0 size=3 id="critIn"></td>
+                <td><input type+"text" value=0 size=3 id="healIn"></td>
+                <td><input type="text" value=0 size=3 id="mfIn"></td>
+                <td></td>
+            </tr>
+            <tr id=attrBody>
+                <td id="powCell"></td>
+                <td id="precCell"></td>
+                <td id="toughCell"></td>
+                <td id="vitCell"></td>
+                <td id="condCell"></td>
+                <td id="critCell"></td>
+                <td id="healCell"></td>
+                <td id="mfCell"></td>
+                <td id="critChanceCell"></td>
+            </tr>
+        </table>
+        <table>
+            <thead>
+                <th>Professions</th>
+                <th>Hit Points</th>
+            </thead>
+            <tr>
+                <th>Warrior, Necromancer</th>
+                <td id="hpHigh"></td>
+            </tr>
+            <tr>
+                <th>Engineer, Ranger, Mesmer</th>
+                <td id="hpMid"></td>
+            </tr>
+            <tr>
+                <th>Guardian, Thief, Elementalist</th>
+                <td id="hpLow"></td>
+            </tr>
+        </table>
+
+        <script>
+            var armorName={
+                "None": ["None"],
+                "Carrion":["cond","pow","vit"],
+                "Knight's":["toug","pow","prec"],
+                "Valkyrie":["pow","vit","crit"],
+                "Berserker's":["pow","prec","crit"], 
+                "Cleric's":["heal","pow","tough"],
+                "Rampager's":["prec","pow","cond"],
+                "Explorer's":["mf","pow","prec"],
+                "Shaman's":["vit","heal","cond"],
+                "Soldier's":["power","toug","vit"],
+                "Rabid":["cond","prec","toug"],
+                "Svanir":["heal","prec","vit"],
+                "Traveler's":["mf","pow","cond"]
+            };
+            attributes = ["pow","prec","toug","vit","cond","crit","heal","mf"];
+            armorPiece={
+                "Head":{"main":45,"minor":32,"crit":2},
+                "Shoulder":{"main":34,"minor":24,"crit":2},
+                "Chest":{"main":101,"minor":72,"crit":5},
+                "Gloves":{"main":34,"minor":24,"crit":2},
+                "Leggings":{"main":64,"minor":48,"crit":3},
+                "Boots":{"main":34,"minor":24,"crit":2},
+                "1hand":{"main":90,"minor":24,"crit":2},
+                "1hand 2":{"main":90,"minor":24,"crit":2},
+                "2hands":{"main":179,"minor":128,"crit":9},
+                "Amulet":{"main":115,"minor":79,"crit":8}, //check other trinkets beside knight's
+                "Ring":{"main":92,"minor":63,"crit":6},   //check other trinkets beside knight's
+                "Ring 2":{"main":92,"minor":63,"crit":6},   //check other trinkets beside knight's
+                "Earring":{"main":81,"minor":55,"crit":6}, ////check other trinkets beside knight's
+                "Earring 2":{"main":81,"minor":55,"crit":6} ////check other trinkets beside knight's
+            };
+
+            var armour = {
+                "helmet": [73, 97, 121],
+                "shoulders": [73, 97, 121],
+                "chest": [314, 338, 363] };
+            var attrObj = function () {};
+            attrObj.prototype.pow  = 916;
+            attrObj.prototype.prec = 916;
+            attrObj.prototype.toug = 916;
+            attrObj.prototype.vit  = 916;
+            attrObj.prototype.cond = 0;
+            attrObj.prototype.crit = 0;
+            attrObj.prototype.critChance = 4;
+            attrObj.prototype.heal = 0;
+            attrObj.prototype.mf   = 0;
+            attrObj.prototype.hpLow   = 10805;
+            attrObj.prototype.hpMed   = 15082;
+            attrObj.prototype.hpHigh   = 18372;
+            attrObj.prototype.armLight = 0;
+            attrObj.prototype.armMed = 0;
+            attrObj.prototype.armHvy = 0;
+
+            function updatePow(attrs) {
+                var cell = document.getElementById("powCell");
+                var cellIn = document.getElementById("powIn").value;
+                attrs.pow += parseInt(cellIn)
+                cell.innerHTML = attrs.pow;
+            }
+
+            function updatePrec(attrs) {
+                var cell = document.getElementById("precCell");
+                var cellIn = document.getElementById("precIn").value;
+                attrs.prec += parseInt(cellIn);
+                cell.innerHTML = attrs.prec;
+                var critChance = Math.floor(attrs.critChance + ((attrs.prec -916)/ 21));
+                var cell = document.getElementById("critChanceCell");
+                cell.innerHTML = critChance;
+                var wastedPrec = critChance % 21;
+            }
+
+            function updateToug(attrs) {
+                var cell = document.getElementById("toughCell");
+                var cellIn = document.getElementById("tougIn").value;
+                attrs.toug += parseInt(cellIn);
+                console.log(attrs.toug);
+                cell.innerHTML = attrs.toug;
+                // TODO: update armour values
+            }
+
+            function updateCrit(attrs) {
+                var cell = document.getElementById("critCell");
+                var cellIn = document.getElementById("critIn").value;
+                attrs.crit += parseInt(cellIn);
+                cell.innerHTML = attrs.crit;
+            }
+
+            function updateVit(attrs) {
+                var cell = document.getElementById("vitCell");
+                var cellIn = document.getElementById("vitIn").value;
+                attrs.vit += parseInt(cellIn);
+                cell.innerHTML = attrs.vit;
+                // HP for the three classes
+                var cell = document.getElementById("hpLow");
+                var low = ((attrs.vit - 916) * 10) + attrs.hpLow;
+                cell.innerHTML = low;
+                var cell = document.getElementById("hpMid");
+                var med = ((attrs.vit - 916) * 10) + attrs.hpMed;
+                cell.innerHTML = med;
+                var cell = document.getElementById("hpHigh");
+                var high = ((attrs.vit - 916) * 10) + attrs.hpHigh;
+                cell.innerHTML = high;
+            }
+
+            function updateCond(attrs) {
+                var cell = document.getElementById("condCell");
+                var cellIn = document.getElementById("condIn").value;
+                attrs.cond += parseInt(cellIn);
+                cell.innerHTML = attrs.cond;
+            }
+
+            function updateHeal(attrs) {
+                var cell = document.getElementById("healCell");
+                var cellIn = document.getElementById("healIn").value;
+                attrs.heal += parseInt(cellIn);
+                cell.innerHTML = attrs.heal;
+            }
+
+            function updateMagicFind(attrs) {
+                var cell = document.getElementById("mfCell");
+                var cellIn = document.getElementById("mfIn").value;
+                attrs.mf += parseInt(cellIn);
+                cell.innerHTML = attrs.mf;
+            }
+
+            function updateStats() {
+                var newAttrs = new attrObj();
+                var aTypes = Object.keys(armorName);
+                var newStats = {};
+                // Loop through each select by it's armour location name
+                for (var aLoc in armorPiece) {
+                    var sel = document.getElementById(aLoc);
+                    // No armor in this location? Skip to next iteration
+                    if (sel.selectedIndex == 0) {
+                        continue;
+                    }
+                    var idx = sel.selectedIndex;
+                    // aLoc contains location (head etc)
+                    // name holds armour name (carrion etc)
+                    var name = aTypes[idx];
+                    var stat1 = armorName[name][0];
+                    var stat2 = armorName[name][1];
+                    var stat3 = armorName[name][2];
+
+                    // Override the values if knight's accesory
+                    if (stat1=="toug"&&stat2=="pow"&&stat3=="prec") {
+                        if (aLoc=="Amulet") {
+                            newAttrs["toug"] += 105;
+                            newAttrs["pow"] += 79;
+                            newAttrs["prec"] += 89;
+                        }
+                        else if (aLoc=="Ring"||aLoc=="Ring 2") {
+                            newAttrs["toug"] += 82;
+                            newAttrs["pow"] += 64;
+                            newAttrs["prec"] += 73;
+                        } 
+                        else if (aLoc=="Earring"||aLoc=="Earring 2") {
+                            newAttrs["toug"] += 71;
+                            newAttrs["pow"] += 55;
+                            newAttrs["prec"] += 65;
+                        } 
+                        else {
+                            newAttrs[stat1] += armorPiece[aLoc]["main"];
+                            newAttrs[stat2] += armorPiece[aLoc]["minor"];
+                            newAttrs[stat3] += armorPiece[aLoc]["minor"];
+                        }
+                    }
+                    else {
+                        newAttrs[stat1] += armorPiece[aLoc]["main"];
+                        newAttrs[stat2] += armorPiece[aLoc]["minor"];
+                        if (stat3 == "crit") {
+                            newAttrs[stat3] += armorPiece[aLoc]["crit"];
+                            } else {
+                            newAttrs[stat3] += armorPiece[aLoc]["minor"];
+                        }
+                    }
+                }
+                updatePow(newAttrs);
+                updatePrec(newAttrs);
+                updateToug(newAttrs);
+                updateCrit(newAttrs);
+                updateVit(newAttrs);
+                updateCond(newAttrs);
+                updateHeal(newAttrs);
+                updateMagicFind(newAttrs);
+            }
+
+            function selectChange() {
+                updateStats()
+            }
+
+            function createSelect(loc) {
+                for (var idx in armorPiece) {
+                    var p = document.createElement("p");
+                    p.innerHTML = idx;
+                    loc.appendChild(p)
+                    var sel = document.createElement("select");
+                    sel.setAttribute("id", idx);
+                    var optVal = 0;
+                    for (var k in armorName) {
+                        opt = document.createElement("option");
+                        opt.innerHTML = armorName[k];
+                        opt.setAttribute("value", optVal);
+                        sel.appendChild(opt);
+                        optVal++;
+                    }
+                    sel.addEventListener("change", selectChange, false);
+                    p.appendChild(sel);
+                }
+                // Add handlers for the text inputs
+                for (var i=0; i < attributes.length; i++) {
+                    field = document.getElementById(attributes[i] + "In");
+                    field.addEventListener("change",selectChange, false);
+                }
+                updateStats();
+            }
+
+
+            var headlist = document.getElementById('headlist');
+            var attrTable = document.getElementById('powCell');
+            var armForm = document.getElementById("armourSelect");
+            createSelect(armForm);
+
+        </script>    
+
+    </body>
+
+</html>
